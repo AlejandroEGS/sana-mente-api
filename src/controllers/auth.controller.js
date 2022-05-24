@@ -4,12 +4,15 @@ import config from "../config";
 import Role from "../models/Role";
 
 export const signUp = async (req, res) => {
-  const { username, email, password, roles } = req.body;
+  const { username, email, password, age, decision, student, roles } = req.body;
 
   const newUser = new User({
     username,
     email,
     password,
+    age,
+    decision,
+    student,
   });
 
   if (roles) {

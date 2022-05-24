@@ -14,6 +14,18 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    age: {
+      type: String,
+      required: true,
+    },
+    decision: {
+      type: String,
+      required: true,
+    },
+    student: {
+      type: Boolean,
+      required: true,
+    },
     roles: [
       {
         ref: "Role",
