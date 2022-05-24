@@ -51,5 +51,5 @@ export const signIn = async (req, res) => {
     expiresIn: 86400,
   });
 
-  res.status(200).json({ token });
+  res.status(200).json({ username: userFound.username, token });
 };
