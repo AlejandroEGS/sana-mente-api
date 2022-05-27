@@ -4,52 +4,61 @@ import config from "../config";
 import Role from "../models/Role";
 
 export const signUp = async (req, res) => {
-  const { username, email, password, age, decision, student, roles } = req.body;
+  try {
+    const { username, email, password, age, decision, student, roles } =
+      req.body;
 
-  const newUser = new User({
-    username,
-    email,
-    password,
-    age,
-    decision,
-    student,
-  });
+    const newUser = new User({
+      username,
+      email,
+      password,
+      age,
+      decision,
+      student,
+    });
 
-  if (roles) {
-    const foundRoles = await Role.find({ name: { $in: roles } });
-    newUser.roles = foundRoles.map((role) => role._id);
-  } else {
-    const role = await Role.findOne({ name: "user" });
-    newUser.roles = [role._id];
+    if (roles) {
+      const foundRoles = await Role.find({ name: { $in: roles } });
+      newUser.roles = foundRoles.map((role) => role._id);
+    } else {
+      const role = await Role.findOne({ name: "user" });
+      newUser.roles = [role._id];
+    }
+
+    const savedUser = await newUser.save();
+
+    const token = jwt.sign({ id: savedUser._id }, config.SECRET, {
+      expiresIn: 86400,
+    });
+
+    res.status(200).json({ token });
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
   }
-
-  const savedUser = await newUser.save();
-
-  const token = jwt.sign({ id: savedUser._id }, config.SECRET, {
-    expiresIn: 86400,
-  });
-
-  res.status(200).json({ token });
 };
 
 export const signIn = async (req, res) => {
-  const userFound = await User.findOne({ email: req.body.email }).populate(
-    "roles"
-  );
+  try {
+    const userFound = await User.findOne({ email: req.body.email }).populate(
+      "roles"
+    );
 
-  if (!userFound) return res.status(400).json({ message: "User not found" });
+    if (!userFound) return res.status(400).json({ message: "User not found" });
 
-  const matchPassword = await User.comparePassword(
-    req.body.password,
-    userFound.password
-  );
+    const matchPassword = await User.comparePassword(
+      req.body.password,
+      userFound.password
+    );
 
-  if (!matchPassword)
-    return res.status(401).json({ message: "Invalid password" });
+    if (!matchPassword)
+      return res.status(401).json({ message: "Invalid password" });
 
-  const token = jwt.sign({ id: userFound._id }, config.SECRET, {
-    expiresIn: 86400,
-  });
+    const token = jwt.sign({ id: userFound._id }, config.SECRET, {
+      expiresIn: 86400,
+    });
 
-  res.status(200).json({ username: userFound.username, token });
+    res.status(200).json({ username: userFound.username, token });
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
 };

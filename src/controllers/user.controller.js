@@ -1,9 +1,13 @@
 import User from "../models/User";
 
 export const getUsers = async (req, res) => {
-  const users = await User.find();
+  try {
+    const users = await User.find();
 
-  res.status(200).json(users);
+    res.status(200).json(users);
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
 };
 
 export const getUserById = async (req, res) => {
@@ -17,21 +21,29 @@ export const getUserById = async (req, res) => {
 };
 
 export const updateUserById = async (req, res) => {
-  const updatedUser = await User.findByIdAndUpdate(
-    req.params.userId,
-    req.body,
-    {
-      new: true,
-    }
-  );
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.userId,
+      req.body,
+      {
+        new: true,
+      }
+    );
 
-  res.status(200).json({ message: "User updated successfully", updatedUser });
+    res.status(200).json({ message: "User updated successfully", updatedUser });
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
 };
 
 export const deleteUserById = async (req, res) => {
-  const { userId } = req.params;
+  try {
+    const { userId } = req.params;
 
-  await User.findByIdAndDelete(userId);
+    await User.findByIdAndDelete(userId);
 
-  res.status(200).json({ message: "User deleted successfully" });
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
 };
